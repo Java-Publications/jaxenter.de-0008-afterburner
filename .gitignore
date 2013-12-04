@@ -1,0 +1,6 @@
+.idea/*
+out/*
+target
+.clover/*
+test-reports/*
+*.iml
