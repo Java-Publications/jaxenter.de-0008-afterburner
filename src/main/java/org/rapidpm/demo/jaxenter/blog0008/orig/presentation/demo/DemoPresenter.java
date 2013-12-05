@@ -10,12 +10,14 @@ import org.rapidpm.demo.jaxenter.blog0008.business.demo.BusinessLogic;
  * Created by Sven Ruppert on 04.12.13.
  */
 public class DemoPresenter {
-    @FXML Label message;
+    @FXML Label messageA;
+    @FXML Label messageB;
 
-    @Inject BusinessLogic businessLogic;
+    @Inject BusinessLogic businessLogicA;
+    @Inject BusinessLogic businessLogicB;
 
     public void launch() {
-        System.out.println("message = " + message);
-        message.setText(businessLogic.doSomething());
+        messageA.setText(businessLogicA.doSomething());
+        messageB.setText(businessLogicB.doSomething());
     }
 }

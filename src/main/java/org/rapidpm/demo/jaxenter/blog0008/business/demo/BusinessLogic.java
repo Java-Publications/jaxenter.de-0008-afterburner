@@ -6,15 +6,17 @@ import javax.inject.Inject;
 /**
  * Created by Sven Ruppert on 04.12.13.
  */
+
 public class BusinessLogic {
 
+    private long stamp = System.nanoTime();
 
     //hier fehlt ein Inject mit Qualifier, Scopes usw.
     @Inject BusinessSubLogic subLogic;
 
     @PostConstruct
     public void init() {
-        System.out.println("BusinessLogic.init()");
+        System.out.println("BusinessLogic.init() stamp -> " + stamp);
     }
 
     public String doSomething() {

@@ -27,41 +27,31 @@ public class InjectionProviderJDK8 {
 
     public static Object instantiatePresenter(Class clazz) {
         try {
-            return registerExistingAndInject(clazz.newInstance());
+            final Object newInstance = clazz.newInstance();
+
+            injectMembers(newInstance); //rekusives injecten
+            initialize(newInstance);    //rekursives init
+            presenters.add(newInstance);
+
+            return newInstance;
         } catch (InstantiationException | IllegalAccessException ex) {
             throw new IllegalStateException("Cannot instantiate view: " + clazz, ex);
         }
     }
 
-    /**
-     * Caches the passed presenter internally and injects all fields internally
-     *
-     * @param instance An already existing (legacy) presenter interesting in
-     *                 injection
-     * @return presenter with injected fields
-     */
-    public static Object registerExistingAndInject(Object instance) {
-        Object product = injectAndInitialize(instance);
-        presenters.add(product);
-        return product;
-    }
 
     static Object instantiateModel(Class clazz) {
         Object product = models.get(clazz);
         if (product == null) {
             try {
-                product = injectAndInitialize(clazz.newInstance());
-                models.put(clazz, product); //kein LifeCycle per Annotation
+                final Object newInstance = clazz.newInstance();
+                injectMembers(newInstance); //rekusives injecten
+                initialize(newInstance);    //rekursives init
+                models.put(clazz, newInstance); //kein LifeCycle per Annotation
             } catch (InstantiationException | IllegalAccessException ex) {
                 throw new IllegalStateException("Cannot instantiate view: " + clazz, ex);
             }
         }
-        return product;
-    }
-
-    static Object injectAndInitialize(Object product) {
-        injectMembers(product); //rekusives injecten
-        initialize(product);    //rekursives init
         return product;
     }
 
@@ -72,7 +62,9 @@ public class InjectionProviderJDK8 {
                 .filter(f -> f.isAnnotationPresent(Inject.class))
                 .forEach(field -> {
                     Class<?> type = field.getType();
+
                     final Object target = instantiateModel(type);
+
                     AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
                         boolean wasAccessible = field.isAccessible();
                         try {
@@ -119,9 +111,7 @@ public class InjectionProviderJDK8 {
     }
 
     public static void forgetAll() {
-        Collection<Object> values = models.values();
-
-        values.forEach(InjectionProviderJDK8::destroy);
+        models.values().forEach(InjectionProviderJDK8::destroy);
         presenters.forEach(InjectionProviderJDK8::destroy);
 
         presenters.clear();
