@@ -7,6 +7,6 @@ import com.airhacks.afterburner.views.FXMLView;
  */
 public class DemoView extends FXMLView {
 
-    //zwanghaftes ableiten von FXMLView...
+    //notwendiges ableiten von FXMLView...
 
 }
